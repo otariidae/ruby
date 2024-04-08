@@ -5951,6 +5951,18 @@ rb_int_s_isqrt(VALUE self, VALUE num)
     }
 }
 
+static VALUE
+int_add(VALUE self, VALUE n)
+{
+    return rb_int_plus(self, n);
+}
+
+static VALUE
+int_sub(VALUE self, VALUE n)
+{
+    return rb_int_minus(self, n);
+}
+
 /*
  * call-seq:
  *   Integer.try_convert(object) -> object, integer, or nil
@@ -6220,6 +6232,9 @@ Init_Numeric(void)
     rb_define_method(rb_cInteger, "truncate", int_truncate, -1);
     rb_define_method(rb_cInteger, "round", int_round, -1);
     rb_define_method(rb_cInteger, "<=>", rb_int_cmp, 1);
+
+    rb_define_method(rb_cInteger, "add", int_add, 1);
+    rb_define_method(rb_cInteger, "sub", int_sub, 1);
 
     rb_define_method(rb_cInteger, "+", rb_int_plus, 1);
     rb_define_method(rb_cInteger, "-", rb_int_minus, 1);

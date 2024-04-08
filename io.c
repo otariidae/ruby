@@ -9031,9 +9031,16 @@ rb_f_p(int argc, VALUE *argv, VALUE self)
     int i;
     for (i=0; i<argc; i++) {
         VALUE inspected = rb_obj_as_string(rb_inspect(argv[i]));
-        rb_uninterruptible(rb_p_write, inspected);
+        rb_uninterruptible(rb_p_write, rb_str_concat(rb_str_new_cstr("p> "), inspected));
     }
     return rb_p_result(argc, argv);
+}
+
+static VALUE
+f_hello(VALUE self, VALUE name)
+{
+    fprintf(stdout, "Hello, %s", RSTRING_PTR(name));
+    return Qnil;
 }
 
 /*
@@ -15555,6 +15562,8 @@ Init_IO(void)
 
     rb_define_global_function("p", rb_f_p, -1);
     rb_define_method(rb_mKernel, "display", rb_obj_display, -1);
+
+    rb_define_global_function("hello", f_hello, 1);
 
     rb_cIO = rb_define_class("IO", rb_cObject);
     rb_include_module(rb_cIO, rb_mEnumerable);

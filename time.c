@@ -5649,6 +5649,22 @@ tm_minus(VALUE tm, VALUE offset)
 }
 
 static VALUE
+time_day_before(int argc, VALUE *argv, VALUE self)
+{
+    VALUE nth;
+    int n, sec, day_before_sec;
+
+    rb_scan_args(argc, argv, "01", &nth);
+    if (nth == Qnil) nth = INT2FIX(1);
+    n = NUM2INT(nth);
+
+    sec = NUM2INT(time_to_i(self));
+    day_before_sec = sec - (60 * 60 * 24 * n);
+
+    return rb_funcall(rb_cTime, rb_intern("at"), 1, INT2NUM(day_before_sec));
+}
+
+static VALUE
 Init_tm(VALUE outer, const char *name)
 {
     /* :stopdoc:*/
@@ -5689,6 +5705,8 @@ Init_tm(VALUE outer, const char *name)
     rb_define_method(tm, "utc", tm_to_time, 0);
     rb_alias(tm, rb_intern_const("to_time"), rb_intern_const("utc"));
     rb_define_singleton_method(tm, "from_time", tm_from_time, 1);
+
+
     /* :startdoc:*/
 
     return tm;
@@ -5811,6 +5829,8 @@ Init_Time(void)
 
     rb_define_method(rb_cTime, "+", time_plus, 1);
     rb_define_method(rb_cTime, "-", time_minus, 1);
+
+    rb_define_method(rb_cTime, "day_before", time_day_before, -1);
 
     rb_define_method(rb_cTime, "round", time_round, -1);
     rb_define_method(rb_cTime, "floor", time_floor, -1);

@@ -8610,6 +8610,69 @@ rb_ary_deconstruct(VALUE ary)
  *  - #sum: Returns a sum of elements according to either <tt>+</tt> or a given block.
  */
 
+static VALUE
+ary_second(VALUE self)
+{
+    VALUE result = rb_ary_entry(self, 1);
+    if (result == Qnil) {
+        rb_raise(rb_eRuntimeError, "Value is nil");
+    }
+    return result;
+}
+
+
+/**
+ * Swaps two elements in the array.
+*/
+static VALUE
+ary_swap_bang(VALUE self, VALUE pos1, VALUE pos2)
+{
+    long i1 = NUM2LONG(pos1);
+    long i2 = NUM2LONG(pos2);
+    VALUE tmp = rb_ary_entry(self, i1);
+    rb_ary_store(self, i1, rb_ary_entry(self, i2));
+    rb_ary_store(self, i2, tmp);
+    return Qnil;
+}
+
+/**
+ * Port of Array.prototype.with() from ECMAScript 2023
+ */
+static VALUE
+ary_with(VALUE self, VALUE pos, VALUE value)
+{
+    long i = NUM2LONG(pos);
+    VALUE clone = rb_ary_dup(self);
+    rb_ary_store(clone, i, value);
+    return clone;
+}
+
+/**
+ * Port of Array.prototype.find() from JavaScript
+ */
+static VALUE
+ary_find(VALUE self)
+{
+    VALUE i = rb_ary_index(0, 0, self); // 第2引数が 0 で良いのかよくわからんけど、動いてるからとにかくヨシ！
+    if (NIL_P(i)) {
+        return Qnil;
+    }
+    return rb_ary_at(self, i);
+}
+
+/**
+ * Port of Array.prototype.findLast() from ECMAScript 2023
+ */
+static VALUE
+ary_rfind(VALUE self)
+{
+    VALUE i = rb_ary_rindex(0, 0, self); // 第2引数が 0 で良いのかよくわからんけど、動いてるからとにかくヨシ！
+    if (NIL_P(i)) {
+        return Qnil;
+    }
+    return rb_ary_at(self, i);
+}
+
 void
 Init_Array(void)
 {
@@ -8732,6 +8795,12 @@ Init_Array(void)
     rb_define_method(rb_cArray, "one?", rb_ary_one_p, -1);
     rb_define_method(rb_cArray, "dig", rb_ary_dig, -1);
     rb_define_method(rb_cArray, "sum", rb_ary_sum, -1);
+
+    rb_define_method(rb_cArray, "second", ary_second, 0);
+    rb_define_method(rb_cArray, "swap!", ary_swap_bang, 2);
+    rb_define_method(rb_cArray, "with", ary_with, 2);
+    rb_define_method(rb_cArray, "find", ary_find, 0);
+    rb_define_method(rb_cArray, "rfind", ary_rfind, 0);
 
     rb_define_method(rb_cArray, "deconstruct", rb_ary_deconstruct, 0);
 }

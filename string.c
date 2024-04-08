@@ -12154,6 +12154,17 @@ rb_enc_interned_str_cstr(const char *ptr, rb_encoding *enc)
     return rb_enc_interned_str(ptr, strlen(ptr), enc);
 }
 
+static VALUE
+str_palindrome_p(VALUE self)
+{
+    const char *pat = "[^A-z0-9\\p{hiragana}\\p{katakana}]";
+    VALUE argv[2] = {rb_reg_regcomp(rb_utf8_str_new_cstr(pat)),
+                    rb_str_new_cstr("")};
+    VALUE filtered_str = rb_str_downcase(0, NULL, str_gsub(2, argv, self, FALSE));
+    return rb_str_empty(filtered_str) ? Qfalse :
+        rb_str_equal(filtered_str, rb_str_reverse(filtered_str));
+}
+
 void
 Init_String(void)
 {
@@ -12209,6 +12220,8 @@ Init_String(void)
     rb_define_method(rb_cString, "-@", str_uminus, 0);
     rb_define_method(rb_cString, "dup", rb_str_dup_m, 0);
     rb_define_alias(rb_cString, "dedup", "-@");
+
+    rb_define_method(rb_cString, "palindrome?", str_palindrome_p, 0);
 
     rb_define_method(rb_cString, "to_i", rb_str_to_i, -1);
     rb_define_method(rb_cString, "to_f", rb_str_to_f, 0);

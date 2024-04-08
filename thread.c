@@ -5442,6 +5442,7 @@ Init_Thread(void)
     rb_define_method(rb_cThread, "backtrace", rb_thread_backtrace_m, -1);
     rb_define_method(rb_cThread, "backtrace_locations", rb_thread_backtrace_locations_m, -1);
 
+
     rb_define_method(rb_cThread, "name", rb_thread_getname, 0);
     rb_define_method(rb_cThread, "name=", rb_thread_setname, 1);
     rb_define_method(rb_cThread, "native_thread_id", rb_thread_native_thread_id, 0);
